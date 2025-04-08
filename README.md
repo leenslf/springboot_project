@@ -1,3 +1,5 @@
+Easier Run on Intellij if available
+
 ### Available features:
 
 - **User Registration API**
