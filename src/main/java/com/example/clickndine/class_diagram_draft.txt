@@ -1,0 +1,93 @@
+                         +------------------------------------------------+
+                         |           ClickndineApplication              |
+                         |  (Spring Boot Main Entry Point; initializes    |
+                         |   component scanning and auto-configuration)   |
+                         +------------------------------------------------+
+                                       |
+                                       v
++--------------------------------------------------------------------------------+
+|                                    User                                        |
+|--------------------------------------------------------------------------------|
+| - id: Long                                                                     |
+| - name: String                                                                 |
+| - email: String                                                                |
+| - phone: String                                                                |
+| - password: String       // (for authentication)                              |
+| - userType: UserType     // (ENUM: CUSTOMER, COURIER, ADMINISTRATOR,         |
+|                         //  RESTAURANT)                                        |
++-------------------------------------+------------------------------------------+
+          /      |         \                          \
+         /       |          \                          \
+        v        v           v                          v
++------------+  +---------+  +--------------+       +--------------+
+| Customer   |  | Courier |  | Administrator|       | Restaurant |
++------------+  +---------+  +--------------+       +--------------+
+| - addresses:|  | - available: Boolean |      | - profileInfo: String      |
+|   List<Address>           |                        | - email, phone, etc.       |
++------------+             +---------+               +-------------+
+         \                              /
+          \                            /
+           v                          v
+                 +----------------------------+
+                 |          Order             |
+                 +----------------------------+
+                 | - id: Long                 |
+                 | - orderDate: Date          |
+                 | - status: OrderStatus      | (ENUM: PLACED, PREPARING, READY_FOR_PICKUP, OUT_FOR_DELIVERY, DELIVERED, CANCELLED)
+                 | - totalCost: Double        |
+                 | - deliveryAddress: Address |
+                 | - customer: Customer       |
+                 | - restaurant: Restaurant   |
+                 | - courier: Courier (opt.)  |
+                 +-------------+--------------+
+                               |
+                               v
+                      +---------------------+
+                      |  OrderLineItem      |
+                      +---------------------+
+                      | - quantity: int     |
+                      | - price: Double     |
+                      | - foodItem: FoodItem|
+                      +---------------------+
+                               |
+                               v
+                      +---------------------+
+                      |      FoodItem       |
+                      +---------------------+
+                      | - id: Long          |
+                      | - name: String      |
+                      | - description: String|
+                      | - price: Double     |
+                      | - available: Boolean|
+                      +---------------------+
+
+                 +----------------------+         +-------------------+
+                 |        Menu          |         |      Payment      |
+                 +----------------------+         +-------------------+
+                 | - foodItems: List<FoodItem> |   | - id: Long        |
+                 +----------------------+         | - method: String  |
+                                                  | - amount: Double  |
+                                                  | - status: PaymentStatus | (ENUM: PENDING, COMPLETED, FAILED)
+                                                  | - order: Order    |
+                                                  +-------------------+
+
+                               +---------------------+
+                               |      Review         |
+                               +---------------------+
+                               | - id: Long          |
+                               | - rating: int       |
+                               | - comment: String   |
+                               | - customer: Customer|
+                               | - restaurant: Restaurant|
+                               +---------------------+
+
+                               +---------------------+
+                               |      Address        |
+                               +---------------------+
+                               | - id: Long          |
+                               | - street: String    |
+                               | - city: String      |
+                               | - state: String     |
+                               | - zipcode: String   |
+                               | - country: String   |
+                               +---------------------+
