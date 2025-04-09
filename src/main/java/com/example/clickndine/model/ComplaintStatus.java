@@ -1,2 +1,7 @@
-package com.example.clickndine.model;public class ComplaintStatus {
+package com.example.clickndine.model;
+
+public enum ComplaintStatus {
+    OPEN,
+    RESOLVED,
+    CLOSED
 }

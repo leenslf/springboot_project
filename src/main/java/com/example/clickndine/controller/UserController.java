@@ -8,6 +8,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.annotation.Validated;
 import org.springframework.web.bind.annotation.*;
+import com.example.clickndine.dto.ForgotPasswordDTO;
+import com.example.clickndine.dto.ResetPasswordDTO;
 
 import jakarta.validation.Valid;
 import java.util.Optional;
@@ -63,5 +65,28 @@ public class UserController {
     public ResponseEntity<Void> deleteAccount(@PathVariable Long id) {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
+    }
+
+    // Logout API endpoint
+    @PostMapping("/logout")
+    public ResponseEntity<String> logoutUser(@RequestHeader("Authorization") String token) {
+        // Optionally, you can add logic to remove the token from a store.
+        userService.logoutUser(token);
+        return ResponseEntity.ok("Logged out successfully");
+    }
+
+    // Forgot password endpoint
+    @PostMapping("/forgot-password")
+    public ResponseEntity<String> forgotPassword(@Valid @RequestBody ForgotPasswordDTO forgotPasswordDTO) {
+        String token = userService.forgotPassword(forgotPasswordDTO);
+        // For demonstration, we return the token in plain text.
+        return ResponseEntity.ok("Reset token generated: " + token);
+    }
+
+    // Reset password endpoint
+    @PostMapping("/reset-password")
+    public ResponseEntity<String> resetPassword(@Valid @RequestBody ResetPasswordDTO resetPasswordDTO) {
+        userService.resetPassword(resetPasswordDTO);
+        return ResponseEntity.ok("Password has been reset successfully. You may now login with the new password.");
     }
 }
