@@ -64,4 +64,12 @@ public class UserController {
         userService.deleteUser(id);
         return ResponseEntity.noContent().build();
     }
+
+    // Logout API endpoint
+    @PostMapping("/logout")
+    public ResponseEntity<String> logoutUser(@RequestHeader("Authorization") String token) {
+        // Optionally, you can add logic to remove the token from a store.
+        userService.logoutUser(token);
+        return ResponseEntity.ok("Logged out successfully");
+    }
 }

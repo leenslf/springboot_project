@@ -1,7 +1,7 @@
 package com.example.clickndine.service;
 
 import com.example.clickndine.dto.UserRegistrationDTO;
-import com.example.clickndine.model.User;
+import com.example.clickndine.model.*;
 import com.example.clickndine.repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
@@ -20,19 +20,69 @@ public class UserService {
     }
 
     // Registration method (already implemented)
+//    public User registerUser(UserRegistrationDTO registrationDTO) {
+//        if (userRepository.findByEmail(registrationDTO.getEmail()) != null) {
+//            throw new RuntimeException("A user with this email already exists.");
+//        }
+//        User user = new User(
+//                registrationDTO.getName(),
+//                registrationDTO.getEmail(),
+//                registrationDTO.getPhone(),
+//                registrationDTO.getPassword(),  // In production, use password hashing
+//                registrationDTO.getUserType()
+//        );
+//        return userRepository.save(user);
+//    }
+
     public User registerUser(UserRegistrationDTO registrationDTO) {
         if (userRepository.findByEmail(registrationDTO.getEmail()) != null) {
             throw new RuntimeException("A user with this email already exists.");
         }
-        User user = new User(
-                registrationDTO.getName(),
-                registrationDTO.getEmail(),
-                registrationDTO.getPhone(),
-                registrationDTO.getPassword(),  // In production, use password hashing
-                registrationDTO.getUserType()
-        );
+        User user;
+        String type = registrationDTO.getUserType().toUpperCase();
+        // No password encoding: using the raw password directly.
+        String rawPassword = registrationDTO.getPassword();
+        switch (type) {
+            case "CUSTOMER":
+                user = new Customer(
+                        registrationDTO.getName(),
+                        registrationDTO.getEmail(),
+                        registrationDTO.getPhone(),
+                        rawPassword
+                );
+                break;
+            case "COURIER":
+                user = new Courier(
+                        registrationDTO.getName(),
+                        registrationDTO.getEmail(),
+                        registrationDTO.getPhone(),
+                        rawPassword
+                );
+                break;
+            case "ADMIN":
+                user = new Administrator(
+                        registrationDTO.getName(),
+                        registrationDTO.getEmail(),
+                        registrationDTO.getPhone(),
+                        rawPassword
+                );
+                break;
+            case "RESTAURANT":
+                Restaurant restaurant = new Restaurant(
+                        registrationDTO.getName(),
+                        registrationDTO.getEmail(),
+                        registrationDTO.getPhone(),
+                        rawPassword
+                );
+                // Constructor already sets default status to "PENDING"
+                user = restaurant;
+                break;
+            default:
+                throw new RuntimeException("Invalid user type provided. Allowed types: CUSTOMER, COURIER, ADMIN, RESTAURANT.");
+        }
         return userRepository.save(user);
     }
+
 
     // Login method (already implemented)
     public String loginUser(com.example.clickndine.dto.UserLoginDTO loginDTO) {
@@ -73,5 +123,33 @@ public class UserService {
     // (Optional) Get all users
     public List<User> getAllUsers() {
         return userRepository.findAll();
+    }
+
+    public void logoutUser(String token) {
+        System.out.println("User logged out with token: " + token);
+    }
+
+    // Approve a restaurant registration.
+    public Restaurant approveRestaurant(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        if (!(user instanceof Restaurant)) {
+            throw new RuntimeException("User with ID " + id + " is not a restaurant.");
+        }
+        Restaurant restaurant = (Restaurant) user;
+        restaurant.setStatus("APPROVED");
+        return userRepository.save(restaurant);
+    }
+
+    // Reject a restaurant registration.
+    public Restaurant rejectRestaurant(Long id) {
+        User user = userRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("User not found"));
+        if (!(user instanceof Restaurant)) {
+            throw new RuntimeException("User with ID " + id + " is not a restaurant.");
+        }
+        Restaurant restaurant = (Restaurant) user;
+        restaurant.setStatus("REJECTED");
+        return userRepository.save(restaurant);
     }
 }
